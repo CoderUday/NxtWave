@@ -1,0 +1,35 @@
+The approach to solve the problem:
+
+Read the markdown file and split it into individual questions using the separator string “—END”.
+For each question, create an empty dictionary to store the information.
+Split the question into lines and iterate over each line.
+For each line, check if it starts with one of the field names, such as “###” for the “id” field, “Question Type:” for the “type” field, “Question:” for the “question” field, etc.
+If the line starts with a field name, extract the information from the line and store it in the dictionary under the appropriate key.
+After processing all lines of a question, append the dictionary to a list.
+After processing all questions, convert the list of dictionaries into a JSON string using the json.dumps() function.
+
+CODE:::
+
+import json
+
+def markdown_to_json(file_path):
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+    questions = []
+    question = {}
+    for line in lines:
+        if line.strip() == '---END':
+            questions.append(question)
+            question = {}
+        elif line.startswith('###'):
+            key = line[3:].strip().lower().replace(' ', '_')
+            value = ''
+        elif line.startswith('-'):
+            value += line[1:].strip() + '\n'
+        else:
+            value += line.strip() + '\n'
+        question[key] = value.strip()
+    return json.dumps(questions, indent=4)
+
+json_data = markdown_to_json('questions.md')
+print(json_data)
